@@ -3967,6 +3967,75 @@ class Client(object):
         }
         return self._request_margin_api('delete', 'userDataStream/isolated', signed=False, data=params)
 
+    # Futures
+
+    def futures_stream_get_listen_key(self):
+        """Start a new futures user data stream and return the listen key
+        If a stream already exists it should return the same key.
+        If the stream becomes invalid a new key is returned.
+
+        Can be used to keep the stream alive.
+
+        https://binance-docs.github.io/apidocs/futures/en/#start-user-data-stream-user_stream
+
+        :returns: API response
+
+        .. code-block:: python
+
+            {
+                "listenKey": "pqia91ma19a5s61cv6a81va65sdf19v8a65a1a5s61cv6a81va65sdf19v8a65a1"
+            }
+
+        :raises: BinanceRequestException, BinanceAPIException
+
+        """
+        res = self._request_futures_api('post', 'listenKey', signed=False, data={})
+        return res['listenKey']
+
+    def futures_stream_keepalive(self, listenKey):
+        """PING a futures user data stream to prevent a time out.
+
+        https://binance-docs.github.io/apidocs/futures/en/#keepalive-user-data-stream-user_stream
+
+        :param listenKey: required
+        :type listenKey: str
+
+        :returns: API response
+
+        .. code-block:: python
+
+            {}
+
+        :raises: BinanceRequestException, BinanceAPIException
+
+        """
+        params = {
+            'listenKey': listenKey
+        }
+        return self._request_futures_api('put', 'listenKey', signed=False, data=params)
+
+    def futures_stream_close(self, listenKey):
+        """Close out a futures user data stream.
+
+        https://binance-docs.github.io/apidocs/spot/en/#listen-key-margin
+
+        :param listenKey: required
+        :type listenKey: str
+
+        :returns: API response
+
+        .. code-block:: python
+
+            {}
+
+        :raises: BinanceRequestException, BinanceAPIException
+
+        """
+        params = {
+            'listenKey': listenKey
+        }
+        return self._request_futures_api('delete', 'listenKey', signed=False, data=params)
+
     # Lending Endpoints
 
     def get_lending_product_list(self, **params):

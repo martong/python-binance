@@ -679,6 +679,22 @@ class BinanceSocketManager(threading.Thread):
         # and start the socket with this specific key
         return self._start_account_socket('margin', margin_listen_key, callback)
 
+    def start_futures_socket(self, callback):
+        """Start a websocket for futures user data
+
+        https://binance-docs.github.io/apidocs/futures/en/#user-data-streams
+
+        :param callback: callback function to handle messages
+        :type callback: function
+
+        :returns: connection key string if successful, False otherwise
+
+        Message Format - see Binance API docs for all types
+        """
+        futures_listen_key = self._client.futures_stream_get_listen_key()
+        # and start the socket with this specific key
+        return self._start_account_socket('futures', futures_listen_key, callback)
+
     def start_isolated_margin_socket(self, symbol, callback):
         """Start a websocket for isolated margin data
 
@@ -699,11 +715,14 @@ class BinanceSocketManager(threading.Thread):
         return self._start_account_socket(symbol, isolated_margin_listen_key, callback)
 
     def _start_account_socket(self, socket_type, listen_key, callback):
-        """Starts one of user or margin socket"""
+        """Starts one of user or margin or futures socket"""
         self._check_account_socket_open(listen_key)
         self._listen_keys[socket_type] = listen_key
         self._account_callbacks[socket_type] = callback
-        conn_key = self._start_socket(listen_key, callback)
+        if socket_type == 'futures':
+            conn_key = self._start_futures_socket(listen_key, callback, 'ws/')
+        else:
+            conn_key = self._start_socket(listen_key, callback)
         if conn_key:
             # start timer to keep socket alive
             self._start_socket_timer(socket_type)
@@ -727,6 +746,10 @@ class BinanceSocketManager(threading.Thread):
     def _keepalive_account_socket(self, socket_type):
         if socket_type == 'user':
             listen_key_func = self._client.stream_get_listen_key
+            callback = self._account_callbacks[socket_type]
+            listen_key = listen_key_func()
+        elif socket_type == 'futures':
+            listen_key_func = self._client.futures_stream_get_listen_key
             callback = self._account_callbacks[socket_type]
             listen_key = listen_key_func()
         elif socket_type == 'margin':  # cross-margin
