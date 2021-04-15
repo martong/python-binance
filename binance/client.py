@@ -808,6 +808,26 @@ class Client(object):
         )
         return kline[0][0]
 
+    def _get_futures_earliest_valid_timestamp(self, symbol, interval):
+        """Get earliest valid open timestamp for futures
+
+        :param symbol: Name of symbol pair e.g BNBBTC
+        :type symbol: str
+        :param interval: Binance Kline interval
+        :type interval: str
+
+        :return: first valid timestamp
+
+        """
+        kline = self.futures_klines(
+            symbol=symbol,
+            interval=interval,
+            limit=1,
+            startTime=0,
+            endTime=None
+        )
+        return kline[0][0]
+
     def get_futures_historical_klines(self, symbol, interval, start_str, end_str=None,
                               limit=500):
         """Get Historical Klines from Binance
@@ -846,7 +866,7 @@ class Client(object):
             start_ts = date_to_milliseconds(start_str)
 
         # establish first available start timestamp
-        first_valid_ts = self._get_earliest_valid_timestamp(symbol, interval)
+        first_valid_ts = self._get_futures_earliest_valid_timestamp(symbol, interval)
         start_ts = max(start_ts, first_valid_ts)
 
         # if an end time was passed convert it
