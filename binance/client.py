@@ -4012,7 +4012,7 @@ class Client(object):
         res = self._request_futures_api('post', 'listenKey', signed=False, data={})
         return res['listenKey']
 
-    def futures_stream_keepalive(self, listenKey):
+    def futures_stream_keepalive(self):
         """PING a futures user data stream to prevent a time out.
 
         https://binance-docs.github.io/apidocs/futures/en/#keepalive-user-data-stream-user_stream
@@ -4029,12 +4029,9 @@ class Client(object):
         :raises: BinanceRequestException, BinanceAPIException
 
         """
-        params = {
-            'listenKey': listenKey
-        }
-        return self._request_futures_api('put', 'listenKey', signed=False, data=params)
+        return self._request_futures_api('put', 'listenKey', signed=False, data={})
 
-    def futures_stream_close(self, listenKey):
+    def futures_stream_close(self):
         """Close out a futures user data stream.
 
         https://binance-docs.github.io/apidocs/spot/en/#listen-key-margin
@@ -4051,10 +4048,7 @@ class Client(object):
         :raises: BinanceRequestException, BinanceAPIException
 
         """
-        params = {
-            'listenKey': listenKey
-        }
-        return self._request_futures_api('delete', 'listenKey', signed=False, data=params)
+        return self._request_futures_api('delete', 'listenKey', signed=False, data={})
 
     # Lending Endpoints
 
