@@ -5215,6 +5215,9 @@ class Client(object):
         """
         return self._request_futures_api('get', 'klines', data=params)
 
+    def futures_continous_klines(self, **params):
+        return self._request_futures_api("get", "continuousKlines", data=params)
+
     def futures_mark_price(self, **params):
         """Get Mark Price and Funding Rate
 
